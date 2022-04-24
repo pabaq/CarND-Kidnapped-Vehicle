@@ -296,12 +296,12 @@ void ParticleFilter::resample() {
 ## Project Result
 ![][solution]
 
-[constant]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/blob/master/images/bicycle_constant_yaw.png "Constant yaw"
-[dynamic]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/blob/master/images/bicycle_yaw_rate.png "Dynamic yaw"
-[observation]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/blob/master/images/observation.png "Observations"
-[transformation]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/blob/master/images/transformation.png "Transformation from vehicle to map coordinates"
-[weight]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/blob/master/images/weight.png "Multivariate-Gaussian"
-[solution]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/blob/master/images/solution.gif "Solution"
+[constant]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/raw/master/images/bicycle_constant_yaw.png "Constant yaw"
+[dynamic]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/raw/master/images/bicycle_yaw_rate.png "Dynamic yaw"
+[observation]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/raw/master/images/observation.png "Observations"
+[transformation]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/raw/master/images/transformation.png "Transformation from vehicle to map coordinates"
+[weight]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/raw/master/images/weight.png "Multivariate-Gaussian"
+[solution]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/raw/master/images/solution.gif "Solution"
 
 [Course]: https://www.udacity.com/course/self-driving-car-engineer-nanodegree--nd013
 [Project]: https://github.com/udacity/CarND-Kidnapped-Vehicle-Project
