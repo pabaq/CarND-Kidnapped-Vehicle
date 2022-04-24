@@ -1,12 +1,32 @@
-# Kidnapped Vehicle
-Vehicle localization using a particle filter.
+This project is part of Udacity's [Self-Driving-Car Nanodegree][Course]. The 
+project description and build instructions can be found [here][Project], the 
+required simulator [here][Simulator].
 
-The goal of this project is to continuously track the location and heading of a vehicle by a two dimensional particle filter implemented in C++. 
+## Vehicle localization using a particle filter
+
+The goal of this project is to track the location and heading of a vehicle in 
+real-time with a two-dimensional particle filter implemented in C++. The idea 
+behind a particle filter is to continuously compare various uncertain 
+observations (e.g. lidar measurements) with the positions of known landmarks on 
+a map (e.g. street corners, traffic signs, buildings etc.), and to finally 
+estimate one's location in respect to those landmarks.
 
 ## Introduction
-A particle filter or Monte Carlo localization, is an algorithm that may be used to estimate the position and orientation (the pose) of a vehicle as it moves and senses the environment on a given map. Since the vehicle's movement may not always be perfectly predictable, many random guesses are generated about where it is going to be next. These guesses are known as the particles. 
+A particle filter or Monte Carlo localization, is an algorithm that may be used 
+to estimate the position and orientation (the pose) of a vehicle as it moves and 
+senses the environment on a given map. Since the vehicle's movement may not 
+always be perfectly predictable, many random guesses are generated about where 
+it is going to be next. These guesses are known as the particles. 
 
-The particles represent a distribution of likely vehicle states. In other words, each particle represents a hypothesis of the vehicle's location. Whenever the vehicle moves, the particles are shifted in a similar way to predict its new state after the movement. Whenever the vehicle observes something, the particles are resampled, based on how well the actual sensed data correlate with the predicted state. Particles that are inconsistent with the observation are discarded and new particles are generated close to the ones that appear consistent. During this recursive process, the particles should converge towards the actual state of the vehicle.
+The particles describe a distribution of likely vehicle states, with each 
+particle representing a hypothesis of the vehicle's location. Whenever the 
+vehicle moves, the particles are shifted in a similar way to predict its new 
+state after the movement. Whenever the vehicle observes something, the particles 
+are resampled, based on how well the actual sensed data correlate with the 
+predicted state. Particles that are inconsistent with the observation are 
+discarded and new particles are generated close to the ones that appear 
+consistent. During this recursive process, the particles should converge towards 
+the actual state of the vehicle.
 
 The algorithm can be subdivided into the following steps:
 
@@ -16,7 +36,15 @@ The algorithm can be subdivided into the following steps:
 4. Repeating steps 2. and 3. for every time step
 
 ## Initialization
-The particle filter is intialized by generating the particles on the map. With absolutly no clue about the intial location of the vehicle, the filter could be initialized by scattering all particles with a uniform random distribution over the complete map. However, in our case GPS data is provided. Although, GPS is not accurate enough to be used for the ongoing localization, it is precise enough to be used as an initial location estimate. The filter is intialized by randomly spawning particles around the initial GPS pose (x, y, theta) with some gaussian noise to consider the uncertainty in the GPS signal. Each particle weight is intialized to be 1 and will be adjusted in the update step.
+The particle filter is intialized by generating the particles on the map. With 
+absolutly no clue about the intial location of the vehicle, the filter could be 
+initialized by scattering all particles with a uniform random distribution over 
+the complete map. However, in our case GPS data is provided. Although, GPS is
+not accurate enough to be used for the ongoing localization, it is precise 
+enough to be used as an initial location estimate. The filter is intialized by 
+randomly spawning particles around the initial GPS pose (x, y, theta) with some 
+gaussian noise to consider the uncertainty in the GPS signal. Each particle 
+weight is intialized to be 1 and will be adjusted in the update step.
 
 ```c++
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
@@ -56,7 +84,12 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 ```
 
 ## Prediction
-A bicycle model is used to simulate the motion of the vehicle. At each time step the velocity and yaw rate are used to predict the new location of the car. Each particle is moved in the same manner. For example, if the car moves forward, all particles move forward too, based on their own pose and no matter in which way they point. Since no actuator is perfect, gaussian noise is added to the state prediction. 
+A bicycle model is used to simulate the motion of the vehicle. At each time step 
+the velocity and yaw rate are used to predict the new location of the car. Each 
+particle is moved in the same manner. For example, if the car moves forward, all 
+particles move forward too, based on their own pose and no matter in which way 
+they point. Since no actuator is perfect, gaussian noise is added to the state 
+prediction. 
 
 Depending on the given yaw rate, the following system equations are implemented:
 
@@ -99,25 +132,59 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 ```
 
 ## Update
-When the vehicle observes its environment, it updates the filters particles to more accuratly reflect where it is. For each particle, the vehicle computes the probability that, had it been at the state of the particle, it would perceive what its sensors have acutally sensed. A weight is assigned to each particle proportional to the said probability. 
+When the vehicle observes its environment, it updates the filter's particles to 
+more accuratly reflect where it is. For each particle, the vehicle computes the 
+probability that, had it been at the state of the particle, it would perceive 
+what its sensors have acutally sensed. A weight is assigned to each particle 
+proportional to the said probability. 
 
-In the case of our project, this can be described as follows. In the image below the red car represents the ground truth location of the vehicle on the map. The vehicle's lidar sensors continously measure the distances to the surrounding landmarks within the sensor range. The observations are illustrated by the red vectors OBS1, OBS2 and OBS3 which point to the landmarks L5, L1 and L2. These observations are expressed in the vehicle's coordinate system (the x-axis pointing in the cars heading direction, the y-axis pointing to the left). 
+In the case of our project, this can be described as follows. In the image below 
+the red car represents the ground truth location of the vehicle on the map. The 
+vehicle's lidar sensors continously measure the distances to the surrounding 
+landmarks within the sensor range. The observations are illustrated by the red 
+vectors OBS1, OBS2 and OBS3 which point to the landmarks L5, L1 and L2. These 
+observations are expressed in the vehicle's coordinate system (the x-axis 
+pointing in the cars heading direction, the y-axis pointing to the left). 
 
 ![][observation]
 
-These observations are also determined for each particle in its own local vehicle frame. This is examplary shown for blue particle which is somewhat shifted and rotated compared to the vehicles ground truth pose. The purpose of this observation transformation is to be able to determine which landmarks each particle would detect if it "uses" the real vehicle's measurements in its own frame. For example, the real car's observation OBS1 points to landmark L5, whereas the same measurement in the particle's frame detects landmark L1. 
+These observations are also determined for each particle in its own local 
+vehicle frame. This is examplary shown for blue particle, which is somewhat 
+shifted and rotated compared to the vehicles ground truth pose. The purpose of
+this observation transformation is to be able to determine which landmarks each 
+particle would detect if it "uses" the real vehicle's measurements in its own 
+frame. For example, the real car's observation OBS1 points to landmark L5, 
+whereas the same measurement in the particle's frame detects landmark L1. 
 
-The determination of which of the landmarks is detected by which of the particle's observations is accomplished by a nearest neighbour association. For this association it is necessary to have the observations expressed in the global map system, since the landmark locations are only known in map coordinates. This coordinate transformation is performed by a translation and rotation as follows
+The determination of which of the landmarks is detected by which of the 
+particle's observations is accomplished by a nearest neighbour association. For 
+this association it is necessary to have the observations expressed in the 
+global map system, since the landmark locations are only known in map 
+coordinates. This coordinate transformation is performed by a translation and 
+rotation as follows
 
 ![][transformation]
 
-Having determined all the paricle observation/landmark associations, the particle weight can be computed. This is done by determining the Multivariate-Gaussian probability density in the dimensions x and y, for each observation/landmark association. 
+Having determined all the paricle observation/landmark associations, the 
+particle weight can be computed. This is done by determining the 
+Multivariate-Gaussian probability density in the dimensions x and y, for each 
+observation/landmark association. 
 
 ![][weight]
 
-The Multivariate-Gaussian is evaluated at the point of the transformed observation's position (the location to where the observation vector points). The mean in the x and y dimensions of the Multivariate-Gaussian are the coordinates of the landmark that was associated to the observation. The standard deviation is the uncertainty in the x and y coordinates of the particle's location, which was already used in the particle filter's intialization. 
+The Multivariate-Gaussian is evaluated at the point of the transformed 
+observation's position (the location to where the observation vector points). 
+The mean in the x and y dimensions of the Multivariate-Gaussian are the 
+coordinates of the landmark that was associated to the observation. The standard 
+deviation is the uncertainty in the x and y coordinates of the particle's 
+location, which was already used in the particle filter's intialization. 
 
-The final particle weight is the product of all the Multivariate-Gaussians computed for each of the observation/landmark associations of this particle. The higher this weight is, the higher is the probability that the location of the particle matches the ground truth location of the vehicle. Besides, the weight also represents the probability of that particle being sampled in the upcoming resampling step.
+The final particle weight is the product of all the Multivariate-Gaussians 
+computed for each of the observation/landmark associations of this particle. 
+The higher this weight is, the higher is the probability that the location of 
+the particle matches the ground truth location of the vehicle. Besides, the 
+weight also represents the probability of that particle being sampled in the 
+upcoming resampling step.
 
 ```c++
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
@@ -190,7 +257,13 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 ```
 
 ## Resampling
-The resampling step can be interpreted as kind of surving of the fittest, since the particles with negligible weights are replaced by new particles in the proximity of the particles with higher weights. In other words, the particles that are consistent with the sensor readings are more likely to be chosen during resampling, probably more than once, wheras the particles inconsistent with the observations are likely to be ommited. This finally lets the particles converge towards the actual state of the vehicle.
+The resampling step can be interpreted as kind of surving of the fittest, since 
+the particles with negligible weights are replaced by new particles in the 
+proximity of the particles with higher weights. In other words, the particles 
+that are consistent with the sensor readings are more likely to be chosen during 
+resampling, probably more than once, wheras the particles inconsistent with the 
+observations are likely to be ommited. This finally lets the particles converge 
+towards the actual state of the vehicle.
 
 ```c++
 void ParticleFilter::resample() {
@@ -230,5 +303,8 @@ void ParticleFilter::resample() {
 [weight]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/blob/master/images/weight.png "Multivariate-Gaussian"
 [solution]: https://github.com/pabaq/CarND-Kidnapped-Vehicle/blob/master/images/solution.gif "Solution"
 
+[Course]: https://www.udacity.com/course/self-driving-car-engineer-nanodegree--nd013
+[Project]: https://github.com/udacity/CarND-Kidnapped-Vehicle-Project
+[Simulator]: https://github.com/udacity/self-driving-car-sim/releases/tag/v1.45
 [1]: https://en.wikipedia.org/wiki/Monte_Carlo_localization
 "https://en.wikipedia.org/wiki/Monte_Carlo_localization"
