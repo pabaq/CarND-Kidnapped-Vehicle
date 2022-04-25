@@ -1,5 +1,5 @@
 This project is part of Udacity's [Self-Driving-Car Nanodegree][Course]. The 
-project description and build instructions can be found [here][Project], the 
+project resources and build instructions can be found [here][Project], the 
 required simulator [here][Simulator].
 
 ## Vehicle localization using a particle filter
